@@ -90,7 +90,8 @@ where last_name like '_i%';--2번째 자리에 i가 들어가는 모든글자
 --salary가 10000 이상인 사람의 email, salary,department_id를 출력하세요.
 select email, salary, department_id
 from employees
-where department_id=80 and salary>10000;
+where department_id=80 and salary>=10000
+order by salary;
 --employees 테이블을 사용하여 80번부서에서
 --salary가 7000이상 8000미만
 --사람의 email,salary, department_id 를 출력하세요
@@ -99,9 +100,46 @@ from employees
 where department_id=80 and salary between 7000 and 7999
 order by salary;
 --employees 테이블을 사용하여 80번부서에서
---salary가 7000미만 8000이상인
+--salary가 7000미만 10000이상인
 --사람의 email,salary, department_id 를 출력하세요
 select email, salary, department_id
 from employees
-where department_id=80 and salary >7000 and salary<=8000
+where department_id=80 and (salary<7000 or salary>=10000)
 order by salary;
+--결과가 한행만 출력 : 단일행 함수
+SELECT sum(salary) from employees;
+select avg(salary) from employees
+where department_id=80;
+--email은 다중행 결과, sum avg 단일행 결과 같이 쓸 수 없다.
+select email, salary, department_id from employees
+where department_id=80 and salary>(SELECT avg(salary) from employees)
+order by salary;
+
+select email from employees
+where department_id=10
+UNION --합집합
+select email from employees
+where department_id=70;
+
+select email from employees
+where department_id=10
+UNION all--합집합 :중복데이터 포함
+select email from employees
+where department_id=10;
+
+select salary from employees
+where department_id=80
+INTERSECT--교집합 and 오름차순 정렬
+select salary from employees
+where salary<24000;
+
+select salary from employees
+where department_id=80
+minus--차집합 and 오름차순 정렬
+select salary from employees
+where salary<8000;
+
+--commition_pct가 있는 email, department_id
+--80번 부서에서 급여가 9000이상은 제외하고 출력
+SELECT email, department_id from employees
+where department_id=80 and commission_pct is not null and salary<9000;

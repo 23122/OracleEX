@@ -1,0 +1,107 @@
+select * from employees;
+select count(*) from employees;
+desc employees;
+
+select employee_id as 사원번호, first_name 이름
+from employees
+where department_id=90;
+
+select  e1.email "email",'배고픕니다'
+from employees e1, employees e2;
+
+select emplotee_id, email, department_id
+from employees;
+select distinct job_id, department_id
+from employees;
+--연결 연산자 ||: 칼럼또는 상수를 붙여서 출력가능합니다.
+select first_name||''||last_name
+from employees;
+
+--null 산술연산시 결과는 null
+--NVL(대상,대체값) : 대상이 null인 경우 대체값으로 적용
+select first_name, salary 기본급,salary*NVL(commission_pct,0) 보너스
+,salary+salary*NVL(commission_pct,0) 총금액
+from employees;
+--where : 원하는 조건만 조회한다.
+select * from employees
+where salary>10000;
+--문자열검색시 ''묶어서 확인, 대소문자 구분합니다.
+select * from employees
+where last_name='King' and first_name='Steven';
+
+select email,hire_date
+from employees
+where hire_date='03/06/17';
+--조건 처리하는 연산자
+-- =같은 조건 검색
+-- !=, <> 같지 않은 조건
+-- > , < , >= , <=
+select email, manager_id
+from employees
+where manager_id is not null;
+--날자도 > >= < <= = 가능하다.
+select email, hire_date
+from employees
+where hire_date > '07/01/01';
+--급여가 10000~20000
+select last_name ,salary
+from employees
+where salary >=10000 and  salary>=17000
+order by salary;
+--between A and B
+select last_name ,salary
+from employees
+where salary between 10000 and 17000
+order by salary;--정렬은 맨마지막에
+--부서번호 10,70 부서 명단.
+select last_name ,department_id
+from employees
+where department_id=10 or department_id=70
+order by salary;
+--in(X,Y,Z)= ex=X or ex=Y or ex=Z 
+select last_name ,department_id
+from employees
+where department_id in(10,70,90)
+order by salary;
+
+select employee_id, last_name
+from employees
+where last_name='King';
+--시작글자 검색
+select employee_id, last_name
+from employees
+where last_name like 'K%';--K로 시작하는 모든 글자
+--글자수 검색
+select employee_id, last_name
+from employees
+where last_name like 'K___';--_1글자, 모든글자 가능
+--끝나는글자 검색
+select employee_id, last_name
+from employees
+where last_name like '%ng';--ng로 끝나는 모든글자
+--중간글자 검색
+select employee_id, last_name
+from employees
+where last_name like '%ng%';--ng가 포함된 모든글자
+select employee_id, last_name
+from employees
+where last_name like '_i%';--2번째 자리에 i가 들어가는 모든글자
+--employees 테이블을 사용하여 80번부서에서
+--salary가 10000 이상인 사람의 email, salary,department_id를 출력하세요.
+select email, salary, department_id
+from employees
+where department_id=80 and salary>10000;
+--employees 테이블을 사용하여 80번부서에서
+--salary가 7000이상 8000미만
+--사람의 email,salary, department_id 를 출력하세요
+select email, salary, department_id
+from employees
+where department_id=80 and salary between 7000 and 7999
+order by salary;
+--employees 테이블을 사용하여 80번부서에서
+--salary가 7000미만 10000이상인
+--사람의 email,salary, department_id 를 출력하세요
+select email, salary, department_id
+from employees
+where department_id=80 and salary >7000 and salary<=8000
+order by salary;

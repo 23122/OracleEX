@@ -139,7 +139,38 @@ minus--차집합 and 오름차순 정렬
 select salary from employees
 where salary<8000;
 
---commition_pct가 있는 email, department_id
+--commission_pct가 있는 email, department_id
 --80번 부서에서 급여가 9000이상은 제외하고 출력
-SELECT email, department_id from employees
-where department_id=80 and commission_pct is not null and salary<9000;
+SELECT email, department_id, salary 
+from employees
+where department_id=80 
+and commission_pct 
+is not null 
+and salary<9000
+order by salary;
+--commission_pct가 있는 email, department_id
+--80번 부서에서 급여가 9000이상은 제외하고 출력
+SELECT email, department_id, salary 
+from employees
+where department_id=80
+INTERSECT 
+SELECT email, department_id, salary 
+from employees
+where commission_pct is not null
+and salary<9000
+order by salary;
+
+SELECT email aaa, salary bbb
+from employees
+where employee_id=100
+union all
+select email bba, salary bbb
+from employees
+where employee_id=101
+order by 1, 2;
+--select X, Y, Z : select된 테이블 순서대로 123배정
+--order by 뒤에 입력순으로 정렬
+select employee_id, salary, department_id
+from employees
+where department_id in(50,80)
+order by 3, 2;

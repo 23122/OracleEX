@@ -99,7 +99,7 @@ from employees
 where department_id=80 and salary between 7000 and 7999
 order by salary;
 --employees 테이블을 사용하여 80번부서에서
---salary가 7000미만 10000이상인
+--salary가 7000미만 8000이상인
 --사람의 email,salary, department_id 를 출력하세요
 select email, salary, department_id
 from employees

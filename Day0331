@@ -48,6 +48,7 @@ select last_name ,salary
 from employees
 where salary >=10000 and  salary>=17000
 order by salary;
+
 --between A and B
 select last_name ,salary
 from employees
@@ -86,12 +87,14 @@ where last_name like '%ng%';--ng가 포함된 모든글자
 select employee_id, last_name
 from employees
 where last_name like '_i%';--2번째 자리에 i가 들어가는 모든글자
+
 --employees 테이블을 사용하여 80번부서에서
 --salary가 10000 이상인 사람의 email, salary,department_id를 출력하세요.
 select email, salary, department_id
 from employees
 where department_id=80 and salary>=10000
 order by salary;
+
 --employees 테이블을 사용하여 80번부서에서
 --salary가 7000이상 8000미만
 --사람의 email,salary, department_id 를 출력하세요
@@ -99,6 +102,7 @@ select email, salary, department_id
 from employees
 where department_id=80 and salary between 7000 and 7999
 order by salary;
+
 --employees 테이블을 사용하여 80번부서에서
 --salary가 7000미만 10000이상인
 --사람의 email,salary, department_id 를 출력하세요
@@ -106,10 +110,12 @@ select email, salary, department_id
 from employees
 where department_id=80 and (salary<7000 or salary>=10000)
 order by salary;
+
 --결과가 한행만 출력 : 단일행 함수
 SELECT sum(salary) from employees;
 select avg(salary) from employees
 where department_id=80;
+
 --email은 다중행 결과, sum avg 단일행 결과 같이 쓸 수 없다.
 select email, salary, department_id from employees
 where department_id=80 and salary>(SELECT avg(salary) from employees)
@@ -148,6 +154,7 @@ and commission_pct
 is not null 
 and salary<9000
 order by salary;
+
 --commission_pct가 있는 email, department_id
 --80번 부서에서 급여가 9000이상은 제외하고 출력
 SELECT email, department_id, salary 
@@ -168,6 +175,7 @@ select email bba, salary bbb
 from employees
 where employee_id=101
 order by 1, 2;
+
 --select X, Y, Z : select된 테이블 순서대로 123배정
 --order by 뒤에 입력순으로 정렬
 select employee_id, salary, department_id

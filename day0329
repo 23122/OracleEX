@@ -1,0 +1,38 @@
+--클라우드 버전에서는 유저생성시 common_user_prefix c##
+--CREATE USER nowon IDENTIFIED BY 1234;
+CREATE USER C##test IDENTIFIED BY 1234;
+--c##없이 생성가능
+alter session set "_ORACLE_SCRIPT"=true;
+create user nowon identified by 1234;
+--계정권한 부여
+grant connect, resource to nowon;
+grant unlimited tablespace to nowon;--Quota
+--계정삭제
+drop user c##test;
+--GRANTEE : USER or ROLE
+--privilege : 부여받은 시스템권한
+SELECT * from DBA_SYS_PRIVS
+where grantee='RESOURCE';
+
+--DDL
+--create, drop, alter
+
+--DML(C R U D) : insert, select, update, delete
+--DML 처리된 데이터는 확정해야 정확히 반영된다.
+INSERT INTO members(no, email, name, password, created_date)
+VALUES(1, 'test01@test.com', '이름', '1234', sysdate);
+
+INSERT INTO members--모든 컬럼 적용시 컬럼명 생략가능,순서는 지켜야합니다.
+VALUES(2, 'test02@test.com', '이름2', '1234', sysdate);
+
+select * from members;
+
+UPDATE members
+set password='4321'
+where no=3;
+
+delete members
+where no=3;
+
+--DCL
+commit;--rollback

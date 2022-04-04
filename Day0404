@@ -11,3 +11,84 @@ select * from dba_sys_privs
 where grantee='CONNECT';
 select * from dba_role_privs
 where granted_role='CONNECT';
+
+select 
+
+
+--show user;
+select * from user_sys_privs;
+select * from user_role_privs;
+insert into member
+values(1, 'test01');
+
+select *from user_sys_privs;
+select *from user_role_privs;
+select *from member;
+insert into member(no,name)
+values(2,'test02');
+insert into member(name,no)
+values('test03',3);--컬럼명 명시한경우 순서가 일치하도록 삽입
+--pk: primary key: 중복불가 null불가
+--키 제약조건
+
+create table board(
+    no number primary key,
+    subject varchar2(225) not null,--not null : null저장불가
+    contant clob not null,
+    writer varchar2(20)--제약조건 미부여시 null허용
+);
+desc board;
+--1. 컬럼명을 생략하여 no가 1인 데이터를 참고하여 데이터를 삽입하세요.
+insert into board
+values (1,'sub01','con01','wrt01');
+--2. 컬럼명을 명시하고 no가 2인 데이터를 참고하여 데이터를 삽입하세요.
+insert into board(no,subject,contant,writer)
+values (2,'sub02','con02','wrt02');
+--3. 컬럼명을 명시하고(null은 제외) no가 3인 데이터를 참고하여 데이터를 삽입하세요.
+insert into board(no,subject,contant)
+values (3,'sub03','con03');
+----------------------------------------
+insert into board--컬럼명을 지정안하면 null입력 불가
+values (4,'sub04','con04');
+insert into board(no,subject,contant)
+values (5,'sub05','con05');
+commit;
+update board
+set no=4,contant='con04',subject='sub04'
+where no=5;
+delete from board
+where no=4;
+truncate table board;--삭제 복구불가
+SELECT * FROM board;
+
+package oracleconn;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+-------JAVA--------
+public class OracleConn2 {
+	
+	public static void main(String[] args) throws SQLException {
+		//DataSource: className(driver), url, username, password
+		String url="jdbc:oracle:thin:@localhost:1521:xe";
+		Connection conn=null;
+		conn=DriverManager.getConnection(url, "test", "9999");
+		
+		Statement stmt=conn.createStatement();
+		String query="select * from member"+" "+"order by no";
+		ResultSet rs=stmt.executeQuery(query);
+		while(rs.next()) {
+			int no=rs.getInt("no");
+			String name=rs.getString("name");
+			System.out.println(no+"\t"+name);
+		}
+		
+		if(stmt!=null)stmt.close();
+		if(conn!=null)conn.close();
+		
+	}
+
+}

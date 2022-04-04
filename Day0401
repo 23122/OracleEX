@@ -115,7 +115,6 @@ from employees cross join departments;
 --카티션 곱의 결과가 나온다.
 
 --emplotees,departments 대상으로 작성하세요
---emplotees,departments 대상으로 작성하세요
 --1.80번 부서의 사원번호, 이메일 부서명을 출력하세요.
 select e.employee_id, e.email, d.department_name
 from employees e, departments d
@@ -162,4 +161,9 @@ on e.department_id in(20,40,60) and(e.department_id=d.department_id);
 SELECT e1.employee_id, e3.first_name||' '||e3.last_name name, e2.department_name
 from employees e1, departments e2, employees e3
 where e1.manager_id=e2.manager_id(+) and e1.manager_id=e3.employee_id(+)
+order by 2;
+--ANIS
+SELECT e1.employee_id, e3.first_name||' '||e3.last_name name, e2.department_name
+from employees e1 left join departments e2 on e1.manager_id=e2.manager_id 
+left join employees e3 on e1.manager_id=e3.employee_id
 order by 2;

@@ -175,6 +175,11 @@ order by 3;
 --서브쿼리의 실행결과가 여러 커럼을 반환한다.
 --main query의 조건절에서 여러컬럼을 동시에 비교가능합니다.
 --비교 컬럼의 개수, 순서 동일해야합니다.
---Scalar(스칼라) 서브쿼리
 
+--Scalar(스칼라) 서브쿼리
 --인라인 서브쿼리
+select b.사원번호, b.사원명, a.부서번호, a.부서명,
+        (select count(*)from 부양가족 y where y.사원번호=b.사원번호) as 부양가족
+from 부서 a, (SELECT * FROM 사원 where 입사년도='2014') b
+where a.부서번호=b.부서번호
+and exists(select 1 from 사원 x where x.부서번호=a.부서번호);

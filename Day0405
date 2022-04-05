@@ -26,11 +26,12 @@ SELECT
 FROM employees;
 select * from emp where employee_id=100;
 drop VIEW EMP;
---단일행 sub query
+--단일행 sub query : 단일조건에 부합하는 결과값 출력
 --80번 부서의 이메일,급여 부서번호 출력
 select email,salary,e.department_id,d.department_name
 from employees e join departments d
-on e.department_id=d.department_id;
+on e.department_id=d.department_id
+where e.department_id=80;
 --email이 'SKING'인 사원의 부서와 같은 사원의
 --email,salary,department_id,department_name
 select email,salary,e.department_id,d.department_name
@@ -62,7 +63,7 @@ where department_id=(select department_id
                      from departments 
                      where department_name='IT');
 --select department_id from departments where department_name='IT';
---다중행 sub query
+--다중행 sub query : 다중 조건에 부합하는 모든 결과값
 --90번 부서의 사원들의 급여 보다 적게 받는 사람들의
 --이메일 급여 부서번호
 select email,salary,department_id
@@ -105,7 +106,7 @@ where salary>10000
 and exists(select department_id
            from departments
            where department_name='IT');
---4.다중컬럼
+--4.다중컬럼 : 다수의 수치가 일치하는 결과값
 --부서별 최대급여를 받는 사원에
 --employee_id, email, department_id, salary를 출력해주세요
 select employee_id, email, department_id, salary
@@ -145,3 +146,35 @@ where (department_id,salary)in(select department_id, max(salary)
                                group by department_id
                                having department_id=80);
 --job_id별로 해당 잡에서 최대연봉을 받는 사원
+--email, job_id, salary
+select email, job_id, salary
+from employees
+where (job_id,salary)in(select job_id, avg(salary)
+                        from employees
+                        group by job_id)
+order by 3 DESC;
+
+--상호 연관 sub query : 여러가지 값을 도출후 조거에 따라 출력
+--전체사원중 자신의 부서의 평균 연봉과 같거나 많은사람
+select email, salary, department_id--출력값
+from employees e1--연봉과같거나 많은사람
+where salary >= (select avg(salary)--부서별 평균연봉 출력
+                 from employees e2
+                 where e1.department_id=e2.department_id)--부서번호가 같을때
+order by 3;
+--main query의 테이블과 sub의 테이블이 연관관계로 표현됨
+-------------------------------------------------------
+--where 연산자 뒤에 ()로 안쪽에 표기
+--1.단일행서브쿼리(single row)
+--서브쿼리의 실행 결과가 항상 1건 이하인 서브쿼리를 의미
+--> , < , >= , <= , <> , != , = : 단일행 비교연산자
+--2.다중행서브쿼리(multi row)
+--서브쿼리의 실행결과가 여러건인 서브쿼리를 의미
+--in, (>, <)all, (>, <)any, (not)exists, sum : 단일행 비교연산자
+--3.다중컬럼(muti column) 서브쿼리
+--서브쿼리의 실행결과가 여러 커럼을 반환한다.
+--main query의 조건절에서 여러컬럼을 동시에 비교가능합니다.
+--비교 컬럼의 개수, 순서 동일해야합니다.
+--Scalar(스칼라) 서브쿼리
+
+--인라인 서브쿼리

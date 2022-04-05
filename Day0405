@@ -1,0 +1,147 @@
+--전체 사원의 평균급여보다 많이 받는 사원의 이메일과 급여
+select email, salary from employees
+where salary>(select avg(salary) from employees)
+order by 2;
+--select avg(salary) from employees;
+
+--email이 'JKING'인 사원의 급여보다 더 많이 받는 사람의 이메일 급여
+select salary
+from employees
+where salary>(select salary 
+              from employees 
+              where email='JKING')
+order by 1;
+--select salary from employees where email='JKING'
+select * from user_sys_privs;
+select * from user_role_privs;
+
+CREATE VIEW EMP
+AS
+SELECT 
+   employee_id emp_id,
+   first_name||' '||last_name name,
+   email,
+   salary,
+   department_id dept_id
+FROM employees;
+select * from emp where employee_id=100;
+drop VIEW EMP;
+--단일행 sub query
+--80번 부서의 이메일,급여 부서번호 출력
+select email,salary,e.department_id,d.department_name
+from employees e join departments d
+on e.department_id=d.department_id;
+--email이 'SKING'인 사원의 부서와 같은 사원의
+--email,salary,department_id,department_name
+select email,salary,e.department_id,d.department_name
+from employees e join departments d
+on e.department_id=(select department_id
+                    from employees
+                    where email='SKING')
+and e.department_id=d.department_id;
+--select department_id from employees where email='SKING'
+--employees
+--email이 'TFOX'의 입사일보다 이후에 입사한 사원의 명단.
+--email, hire_date
+select email, hire_date
+from employees
+where hire_date>(select hire_date
+                 from employees
+                 where email='TFOX')
+order by 2;
+--select hire_date from employees where email='TFOX';
+--단일행 sub query 실행결과가 행이 1개인경우
+
+--다중행 sub query
+--employees
+--department_name이 'IT' 사원의
+--employee_id, email, department_id
+select employee_id, email, department_id
+from employees
+where department_id=(select department_id 
+                     from departments 
+                     where department_name='IT');
+--select department_id from departments where department_name='IT';
+--다중행 sub query
+--90번 부서의 사원들의 급여 보다 적게 받는 사람들의
+--이메일 급여 부서번호
+select email,salary,department_id
+from employees
+where salary <all(select salary
+                  from employees
+                  where department_id=60)
+order by 2;
+--select salary from employees where department_id=60;
+--다중행 sub query 연산자
+--in (=XXX or YYY or ZZZ)
+-->all : 최대값
+--<all : 최소값
+-->any : 최소값
+--<any : 최대값
+--전체사원중 job_id가 FI_ACCOUNT 인 사원의 최소 연봉자보다 높은
+--사원의 email, job_id,salary
+select email, job_id, salary
+from employees
+where salary >any(select salary
+                  from employees
+                  where job_id='FI_ACCOUNT')
+order by 3;
+
+--employees 테이블을 조회하여 전체사원중 부서가 80번 부서 신입사원보다
+--늦게 입사한 사원들 명단
+--email, hire_date,department_id
+select email, hire_date,department_id
+from employees
+where hire_date>all(select hire_date
+                    from employees
+                    where department_id=(select department_id
+                                         from departments
+                                         where department_name='IT'))
+order by 2;
+
+select email, salary, department_id
+from employees
+where salary>10000
+and exists(select department_id
+           from departments
+           where department_name='IT');
+--4.다중컬럼
+--부서별 최대급여를 받는 사원에
+--employee_id, email, department_id, salary를 출력해주세요
+select employee_id, email, department_id, salary
+from employees
+  --부서번호와 급여가 같은 사원   --부서그룹중에 최대급여를 받는 사원의 부서번호,급여액
+where (department_id,salary) in (select department_id,max(salary)--최대급여
+                                 from employees                        
+                                 GROUP by department_id)--부서별
+order by 3;
+--select department_id, max(salary) from employees
+--GROUP by department_id;
+
+--부서별 신입사원의 명단의 출력
+--email,departmet_id,hire_date 출력
+select email, department_id, hire_date
+from employees
+where (department_id,hire_date) in(select department_id, MAX (hire_date)
+                                   FROM employees
+                                   GROUP BY department_id)
+order by 2;
+--70번 부서의 최대 급여를 받는 사원
+select email,salary, department_id
+from employees
+where department_id=80 and salary=(select max(salary)
+                                   from employees
+                                   where department_id=80);
+select email,salary, department_id
+from employees
+where (department_id,salary)=(select department_id, max(salary)
+                              from employees
+                              group by department_id
+                              having department_id=80);
+select email,salary, department_id
+from employees
+where (department_id,salary)in(select department_id, max(salary)
+                               from employees
+                               group by department_id
+                               having department_id=80);
+--job_id별로 해당 잡에서 최대연봉을 받는 사원

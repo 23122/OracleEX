@@ -7,6 +7,15 @@ select email,(select department_name
               from departments d
               where e.department_id=d.department_id) dname
 from employees e;
+--department_id 부서별인원수 출력
+select e.department_id,(select count(s.department_id)
+                        from employees s
+                        where s.department_id=e.department_id
+                        group by department_id)부서원수
+from (select department_id
+      from employees
+      group by department_id) e
+ORDER by department_id;
 
 --inline view
 --최근 입사한 입사일 기준으로 3,4번째 입사자 명단

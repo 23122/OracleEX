@@ -49,7 +49,7 @@ public class BoardConn {
 			conn=DriverManager.getConnection(url, user, password);
 			System.out.println("DB접속완료!");
 			//쿼리실행
-			for(int i=0;i<=10000;i++) {//쿼리문
+			for(int i=0;i<=10000;i++) {//쿼리 반복문
 				String sql="insert into board "
 						+"values(SEQ_BOARD.nextval,?,0,?,systimestamp)";
 				ptmt=conn.prepareStatement(sql);

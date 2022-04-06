@@ -1,0 +1,64 @@
+select SEQ_BOARD.nextval from dual;--시퀀스값을 1부터 1씩증가
+------------------------java에서데이터입력----------------
+package oracleconn;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class BoardConn {
+	
+	public static void main(String[] args) throws SQLException {
+		//DataSource :driverClassName, url, username,password
+		String url="jdbc:oracle:thin:@localhost:1521:xe";
+		String user="nowon";
+		String password="1234";
+		Connection conn=null;
+		PreparedStatement ptmt=null;
+		try {//DB접속
+			conn=DriverManager.getConnection(url, user, password);
+			System.out.println("DB접속완료!");
+			//쿼리실행
+			for(int i=0;i<=10000;i++) {//쿼리문
+				String sql="insert into board "
+						+"values(SEQ_BOARD.nextval,?,0,?,systimestamp)";
+				ptmt=conn.prepareStatement(sql);
+				//? 세팅
+				ptmt.setString(1,"제목"+(i+1));
+				ptmt.setString(2,"작성자"+(i%5+1));
+				
+				ptmt.executeUpdate();
+				if(ptmt!=null)ptmt.close();
+			}
+			System.out.println("입력완료");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(conn!=null)conn.close();
+		}
+		
+	}
+
+}
+-----------------------Oracle에서 동적view사용-------------------------------
+--최신항목검색
+SELECT * FROM board
+order by no desc;
+--최신항목중 상위 10개
+select * from board
+where no between 1 and 10
+order by no desc;
+
+--row num
+select rownum, b.* from board b
+order by no desc;
+
+select *
+from (select rownum rnum, b.*--rnum=1++,b.*=최신순으로 정리한보드의 모든값
+      from (select *--no값이 큰수로 정렬 = 최신순으로 정렬 : b=최신순으로 정리해논 board 
+            from board
+            order by no desc)b)
+where rnum between 9989 and 10000;--rnum 의 수치 검색
+--동적 view를 생성하는 sub query : inline query
+--from 절 뒤에 오는 서브쿼리입니다.

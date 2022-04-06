@@ -11,8 +11,8 @@ from employees e;
 --inline view
 --최근 입사한 입사일 기준으로 3,4번째 입사자 명단
 --email, hire_date, department_id 출력
-select email, hire_date, department_id
-from (select rownum rnum, e.email, e.hire_date, e.department_id
+select *
+from (select rownum rnum, e.*
      from (select email, hire_date, department_id
            from employees
            order by hire_date desc)e)

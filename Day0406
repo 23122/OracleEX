@@ -1,3 +1,23 @@
+select email, department_name
+from employees e, departments d
+where e.department_id=d.department_id(+);
+---------------
+--scalar sub query
+select email,(select department_name
+              from departments d
+              where e.department_id=d.department_id) dname
+from employees e;
+
+--inline view
+--최근 입사한 입사일 기준으로 3,4번째 입사자 명단
+--email, hire_date, department_id 출력
+select email, hire_date, department_id
+from (select rownum rnum, e.email, e.hire_date, e.department_id
+     from (select email, hire_date, department_id
+           from employees
+           order by hire_date desc)e)
+where rnum in (3,4);
+
 select SEQ_BOARD.nextval from dual;--시퀀스값을 1부터 1씩증가
 ------------------------java에서데이터입력----------------
 package oracleconn;

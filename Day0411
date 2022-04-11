@@ -125,37 +125,35 @@ sysdate);
 
 execute proc_tot();
 
-create or replace NONEDITIONABLE PROCEDURE PROC_TOT AS 
---변수 선언
+CREATE OR REPLACE PROCEDURE PROC_TOT AS 
 v_tot number;
 v_avg number;
 --coffee.cdate컬럼의 타입을 적용
---PL/SQL(ORACLE) 대입연산자 ':='
-v_today coffee.cdate%TYPE:=trunc(sysdate);
+--PL/SQL(ORACLE)의 대입연산자 " := "
+v_today coffee.cdate%type:=trunc(sysdate);
 v_count number:=0;
 BEGIN
   --매출합계
   select sum(price) into v_tot
-  from coffee 
+  from coffee
   where cdate>=v_today;
-  --평단
+  --평균
   select avg(price) into v_avg
   from coffee
   where cdate>=v_today;
-  --오늘 매출액 집계를 했는지 count 확인
-  select count(day)into v_count from total
-  where day>=trunc(sysdate);
-  --total 테이블에 삽입
+  --count 확인
+  select count(tdate) into v_count from total
+  where tdate >= trunc(sysdate);
+  --total table에 삽입
   if v_count=0 then
-    --조건이 true인경우 insert 
-    insert into total(day, tot, avg)
-    values(v_today, v_tot, v_avg);
+  --조건이 ture인경우 insert
+    insert into total
+    values (v_tot,v_avg,v_today);
     else
     --update
     update total
-    set tot=v_tot, avg=v_avg
-    where day=v_today;
+    set tot=v_tot,agv=v_avg
+    where trunc(tdate)=trunc(v_today);
   end if;
   commit;
-  
 END PROC_TOT;

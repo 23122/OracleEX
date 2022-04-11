@@ -1,0 +1,143 @@
+--뷰 생성 권한 부여
+grant create view to ncstest;
+--뷰생성
+create view emp
+as
+select
+employee_id EMP_ID,
+FIRST_NAME||' '||last_name name,
+salary,email,hire_date
+from employees;
+insert into test
+values (SEQ_TEST.nextval,'AAA',SYSTIMESTAMP);
+
+CREATE SEQUENCE SEQ_TEST INCREMENT BY 1 START WITH 1;
+
+select SEQ_TEST.currval from dual;
+select * from test;
+rollback;
+
+delete from test
+where NO=2;
+
+update test
+set name='bbb'
+where no=2;
+
+update test
+set name='ccc',created_date=systimestamp
+where no=2;
+
+COMMIT;
+--SQL
+--DDL:CREATE, DROP, ALTER
+--DML:CRUD(insert, select, update, delete)
+--DCL:COMMIT, REVOKE, TCL(GRANT, ROLLBACK)
+
+--컬럼추가
+--CREATE TABLE
+--ALTER TABLE
+--DROP TABLE
+alter table 테이블이름
+add 컬럼명(데이터타입)제약조건;
+rollback;--DML을통해 변경사항을 복구
+truncate table test;--롤백불가
+--잘라내기--table 구조는 유지하고 데이터만 삭제
+--table 전체삭제는 :drop
+
+--컬럼삭제
+alter table test
+drop column 컬럼명;
+desc test;
+--데이터타입변경
+alter table test
+modify name number;
+--컬럼이름변경
+alter table test
+--기존컬럼명 to 변경할컬럼명
+rename column no to mno;
+--테이블 삭제
+drop table test;
+--기존 테이블 또는 뷰 를 통해서 생성가능합니다.
+CREATE VIEW TEST_VIEW
+AS
+select no, name from test;
+--뷰로 뷰만들기
+CREATE VIEW TEST_COPY
+AS
+select no, name from TEST_VIEW
+with read only;--수정불가
+--뷰생성 권한부여
+grant create view to ncstest;
+
+drop test_view;
+--제약조건
+--not null
+--unique : 중복제거
+--primary key : not null + unique
+--foreign key : 다른테이블의 pk를 참조 하는 key
+--check : ckeck에 설정된 조건만 허용
+create table test02(
+    no number primary key,
+    count number CHECK (count >= 0));
+insert test02
+into (1,0);
+create table test03(
+    no number constraint test03_pk primary key,
+    email varchar2(255) constraint email_uk unique,
+    name varchar2(255) constraint name_nn not null
+);
+create table test04(
+    no number,
+    email varchar2(255),
+    name varchar2(255) constraint test04_name_nn not null,
+    constraint test04_pk primary key(no),
+    constraint test04_email_uk unique(email)
+);
+create table test05(
+    no number primary key,
+    email varchar2(255) unique,
+    name varchar2(255) not null
+);
+--key 종류
+--슈퍼키: 유일성을 특징을 만족하는 속성 또는 속성의 집합
+--후보키: 유일성+최소성을 만족하는 속성 도는 속성의 집합
+--하나의 속성으로 구성된 키가 최소성
+--기본키: 후보키들 중에서 pk로 선정된 후보키
+--대체키: 후보키들 중에서 pk로 선정되지 않은 나머지 후보키
+--외래키: 참조테이블의 pk
+
+--절차형 sql 작성하기
+--프로시저,함수,트리거
+
+--프로시저
+insert into coffee
+VALUES(SEQ_COFFEE.nextval,'라떼',2500,systimestamp+1);
+
+select sum(price) 매출합계 from coffee;
+select avg(price) 평단 from coffee;
+
+insert into total
+values(
+(select sum(price) from coffee),
+(select avg(price) from coffee),
+sysdate);
+
+execute proc_tot();
+
+--프로시저 생성
+CREATE OR REPLACE PROCEDURE PROC_TOT AS 
+v_tot number;
+v_avg number;
+BEGIN
+  --매출합계
+  select sum(price) into v_tot
+  from coffee;
+  --평균
+  select avg(price) into v_avg
+  from coffee;
+  --total table에 삽입
+  insert into total
+  values (v_tot,v_avg,sysdate);
+  commit;
+END PROC_TOT;

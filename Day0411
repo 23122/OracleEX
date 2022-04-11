@@ -110,9 +110,8 @@ create table test05(
 --절차형 sql 작성하기
 --프로시저,함수,트리거
 
---프로시저
 insert into coffee
-VALUES(SEQ_COFFEE.nextval,'라떼',2500,systimestamp+1);
+VALUES(SEQ_COFFEE.nextval,'아메리카노',1900,systimestamp+1);
 
 select sum(price) 매출합계 from coffee;
 select avg(price) 평단 from coffee;
@@ -124,8 +123,34 @@ values(
 sysdate);
 
 execute proc_tot();
+select*from total;
 
-CREATE OR REPLACE PROCEDURE PROC_TOT AS 
+alter table total
+modify tdate date;
+desc total;
+---4월 13일의 매출내역만 출력하세요.
+select*from coffee
+where cdate>trunc(sysdate);
+--시간을 컨트롤 할께요..
+select 
+sysdate,
+trunc(sysdate),--시간을 잘라내고 처리
+trunc(sysdate,'DD')
+trunc(sysdate,'YY')
+from dual;
+
+insert into coffee
+VALUES(SEQ_COFFEE.nextval,'아메리카노',1900,trunc(sysdate));
+select* from coffee
+order by cdate desc;
+
+select* from total;
+
+select count(tdate) from total
+where tdate >= trunc(sysdate);
+
+--프로시저 생성1
+create or replace NONEDITIONABLE PROCEDURE PROC_TOT AS 
 v_tot number;
 v_avg number;
 --coffee.cdate컬럼의 타입을 적용
@@ -152,8 +177,42 @@ BEGIN
     else
     --update
     update total
-    set tot=v_tot,agv=v_avg
+    set sum=v_tot, avg=v_avg
     where trunc(tdate)=trunc(v_today);
   end if;
   commit;
 END PROC_TOT;
+
+--프로시저 생성2
+CREATE OR REPLACE
+PROCEDURE PRO_TOT_SELECT (
+P_DATE IN total.tdate%type--파라미터 변수
+) AS 
+v_tot total.sum%type;
+v_avg total.avg%type;
+v_count number :=0; --" := "대입연산자
+BEGIN
+  --합계
+  select sum(price) into v_tot
+  from coffee
+  where cdate=P_DATE;
+  --평균
+  select avg(price) into v_avg
+  from coffee
+  where cdate=P_DATE;
+  --오늘 날자의 데이터 유무 확인
+  --없으면 0 있으면 1
+  select count(tdate) into v_count
+  from total
+  where tdate=P_DATE;
+  --중복처리문
+  if v_count=0 then
+  insert into total
+    values (v_tot,v_avg,p_date);
+    else
+        update total
+        set sum=v_tot, avg=v_avg
+        where tdate=p_date;
+  commit;
+  end if;
+END PRO_TOT_SELECT;

@@ -1,0 +1,39 @@
+insert into coffee
+values (seq_coffee.nextval,'자몽에이드',3500,systimestamp -1);
+
+--매출집계
+insert into total
+values (
+    SYSTIMESTAMP-1,
+    (select sum(price) from coffee),
+    (select avg(price) from coffee)
+);
+select*from total;
+
+select to_timestamp('22/04/11') from dual;
+execute proc_tot('22/04/11');
+
+----프로시저 생성----
+CREATE OR REPLACE PROCEDURE
+PROC_TOT (P_DATE IN timestamp) AS
+v_tot number;
+v_avg total.avg%type;
+v_count number :=0;
+BEGIN
+    select sum(price), avg(price)
+    into v_tot, v_avg
+    from coffee
+    where trunc(cdate)=trunc(p_date);
+    select count(day) into v_count
+    from total
+    where trunc(day)=trunc(p_date);
+    if v_count=0 then
+        insert into total
+        values (p_date,v_tot,v_avg);
+        else
+            update total
+            set tot=v_tot, avg=v_avg
+            where trunc(day)=trunc(p_date);
+    commit;
+    end if;
+END PROC_TOT;

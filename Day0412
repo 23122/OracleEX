@@ -11,8 +11,12 @@ values (
 select*from total;
 
 select to_timestamp('22/04/11') from dual;
-execute proc_tot('22/04/11');
+execute proc_tot(systimestamp);
 execute proc_today_tot;
+
+variable v_msg varchar2(255);
+execute proc_tot(systimestamp, :v_msg);
+print v_msg;
 
 ----프로시저 생성----
 CREATE OR REPLACE PROCEDURE
@@ -64,3 +68,29 @@ BEGIN
   end if;
   commit;
 END PROC_TODAY_TOT;
+----아웃변수 프로시저----
+create or replace NONEDITIONABLE PROCEDURE
+PROC_TOT (P_DATE IN timestamp, o_msg out varchar2) AS
+v_tot number;
+v_avg total.avg%type;
+v_count number :=0;
+BEGIN
+    select sum(price), avg(price)
+    into v_tot, v_avg
+    from coffee
+    where trunc(cdate)=trunc(p_date);
+    select count(day) into v_count
+    from total
+    where trunc(day)=trunc(p_date);
+    if v_count=0 then
+        insert into total
+        values (p_date,v_tot,v_avg);
+        o_msg:='삽입완료';
+    else
+        update total
+        set tot=v_tot, avg=v_avg
+        where trunc(day)=trunc(p_date);
+         o_msg:='수정완료';
+    end if;
+    commit;
+END PROC_TOT;

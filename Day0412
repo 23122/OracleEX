@@ -95,4 +95,41 @@ BEGIN
     commit;
 END PROC_TOT;
 
+-------------ncstest-------------
+CREATE TABLE BOARD_TEST
+(
+  BNO NUMBER PRIMARY KEY 
+, SUBJET VARCHAR2(200) NOT NULL 
+, CONTENT VARCHAR2(225) NOT NULL 
+, WRITER VARCHAR2(20) NOT NULL 
+, READ_COUNT NUMBER DEFAULT 0 
+, CREATED_DATE TIMESTAMP NOT NULL 
+)
+pctfree 20 
+pctused 40 
+TABLESPACE USERS;
+COMMENT ON TABLE BOARD__TEST IS '게시판';
+COMMENT ON COLUMN BOARD__TEST.BNO IS '게시글번호';
+COMMENT ON COLUMN BOARD__TEST.SUBJET IS '제목';
+COMMENT ON COLUMN BOARD__TEST.CONTENT IS '내용';
+COMMENT ON COLUMN BOARD__TEST.WRITER IS '작성자';
+COMMENT ON COLUMN BOARD__TEST.READ_COUNT IS '조회수';
+COMMENT ON COLUMN BOARD__TEST.CREATED__DATE IS '작성일';
+SELECT TABLESPACE_NAME, TABLE_NAME FROM ALL_ALL_TABLES WHERE TABLE_NAME LIKE 'BOARD_TEST';
 
+CREATE SEQUENCE SEQ_BNO INCREMENT BY 1 START WITH 1;
+
+INSERT INTO BOARD_TEST (bno,subjet,content,writer,created_date)
+VALUES (SEQ_BNO.nextval,'sql테스트1','데이터베이스1','박종진',sysdate);
+select * from board_test;
+update board_test
+set read_count=read_count+1
+where bno=1;
+INSERT INTO BOARD_TEST
+VALUES (SEQ_BNO.nextval,'sql테스트2','데이터베이스2','guest',0,sysdate);
+select * from board_test where writer='박종진';
+commit;
+delete from board_test
+where writer='guest';
+ROLLBACK;
+drop table board_test;

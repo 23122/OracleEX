@@ -12,6 +12,7 @@ select*from total;
 
 select to_timestamp('22/04/11') from dual;
 execute proc_tot('22/04/11');
+execute proc_today_tot;
 
 ----프로시저 생성----
 CREATE OR REPLACE PROCEDURE
@@ -40,3 +41,26 @@ BEGIN
     end if;
     commit;
 END PROC_TOT;
+----파라미터가 없는 프로시저-----
+CREATE OR REPLACE PROCEDURE PROC_TODAY_TOT AS
+v_tot total.tot%type;
+v_avg total.avg%type;
+v_date coffee.cdate%type:=trunc(systimestamp);
+v_count NUMBER :=0;
+BEGIN
+  select sum(price), avg(price)
+  into v_tot, v_avg
+  from coffee
+  where trunc(cdate)=v_date;
+  select count(day) into v_count
+  from total
+  where trunc(day)=v_date;
+  if v_count=0 then
+    insert into total
+    values (v_date,v_tot,v_avg);
+  else update total
+    set tot=v_tot, avg=v_avg
+    where trunc(day)=v_date;
+  end if;
+  commit;
+END PROC_TODAY_TOT;

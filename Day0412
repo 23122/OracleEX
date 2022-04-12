@@ -15,25 +15,28 @@ execute proc_tot('22/04/11');
 
 ----프로시저 생성----
 CREATE OR REPLACE PROCEDURE
-PROC_TOT (P_DATE IN timestamp) AS
-v_tot number;
-v_avg total.avg%type;
-v_count number :=0;
+PROC_TOT (P_DATE IN timestamp) AS--파라미터변수 P_DATE
+v_tot number;--변수 tot선언
+v_avg total.avg%type;--변수 avg선언
+v_count number :=0;--중복처리
 BEGIN
+    --합계,평단계산후 변수에 입력
     select sum(price), avg(price)
     into v_tot, v_avg
     from coffee
-    where trunc(cdate)=trunc(p_date);
+    where trunc(cdate)=trunc(p_date);--파라미터변수 날짜와 같은 날
+    --중복확인
     select count(day) into v_count
     from total
     where trunc(day)=trunc(p_date);
-    if v_count=0 then
+    --중복 처리문
+    if v_count=0 then--중복이 없으면
         insert into total
         values (p_date,v_tot,v_avg);
-        else
+        else--중복이 있으면
             update total
             set tot=v_tot, avg=v_avg
             where trunc(day)=trunc(p_date);
-    commit;
     end if;
+    commit;
 END PROC_TOT;

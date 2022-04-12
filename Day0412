@@ -33,10 +33,10 @@ BEGIN
     if v_count=0 then--중복이 없으면
         insert into total
         values (p_date,v_tot,v_avg);
-        else--중복이 있으면
-            update total
-            set tot=v_tot, avg=v_avg
-            where trunc(day)=trunc(p_date);
+    else--중복이 있으면
+        update total
+        set tot=v_tot, avg=v_avg
+        where trunc(day)=trunc(p_date);
     end if;
     commit;
 END PROC_TOT;

@@ -116,3 +116,19 @@ SELECT TO_CHAR(sysdate, 'YYYYMM') FROM DUAL;
 SELECT TO_date('20200202') FROM DUAL;
 SELECT TO_date('202002', 'yyyymm') FROM DUAL;
 SELECT TO_timestamp('202002 02', 'yyyymm hh') FROM DUAL;
+
+insert into list
+values (TO_char(sysdate,'yyyymm'),1000);
+
+--이번달 각각 급여(기본급+보너스(기본급*commissin_pct))
+select sum(salary*(1+nvl(commission_pct,0)))
+from employees;
+
+--이번달에 회사에서 지급할 총급여를 list에 넣으세요
+insert into list
+VALUES (
+TO_char(sysdate,'yyyymm'),
+(select 
+    sum(salary*(1+nvl(commission_pct,0)))
+    from employees)
+);

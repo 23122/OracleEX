@@ -1,0 +1,78 @@
+CREATE TABLE COFFEE 
+(
+  NO NUMBER PRIMARY KEY 
+, COLUMN2 VARCHAR2(20) 
+, PRICE NUMBER 
+, CDATE TIMESTAMP 
+);
+CREATE SEQUENCE SEQ_COFFEE INCREMENT BY 1 START WITH 1;
+
+SELECT TABLESPACE_NAME, TABLE_NAME 
+FROM ALL_ALL_TABLES 
+WHERE TABLE_NAME LIKE 'COFFEE';
+
+insert into coffee
+values (seq_coffee.nextval,'라떼',2500,sysdate);
+
+delete coffee where no = 1;
+select * from coffee;
+
+update coffee
+set price = 1000
+where no = 3;
+----insert 트리거-----
+CREATE OR REPLACE TRIGGER TRIG_TOT 
+AFTER INSERT ON COFFEE
+DECLARE
+v_tot total.tot%type;
+v_avg total.avg%type;
+v_date coffee.cdate%type:=trunc(systimestamp);
+v_count NUMBER :=0;
+BEGIN
+  select sum(price), avg(price)
+  into v_tot, v_avg
+  from coffee
+  where trunc(cdate)=v_date;
+  select count(day) into v_count
+  from total
+  where trunc(day)=v_date;
+  if v_count=0 then
+    insert into total
+    values (v_date,v_tot,v_avg);
+  else update total
+    set tot=v_tot, avg=v_avg, day=v_date
+    where trunc(day)=v_date;
+  end if;
+END;
+-----delete 트리거------
+CREATE OR REPLACE TRIGGER TRIG_DEL 
+AFTER DELETE ON COFFEE 
+DECLARE
+v_tot total.tot%type;
+v_avg total.avg%type;
+v_date coffee.cdate%type:=trunc(systimestamp);
+BEGIN
+  select sum(price), avg(price)
+  into v_tot, v_avg
+  from coffee
+  where trunc(cdate)=v_date;
+  update total
+    set tot=v_tot, avg=v_avg, day=v_date
+    where trunc(day)=v_date;
+END;
+----update 트리거----
+CREATE OR REPLACE TRIGGER TRIG_DEL 
+AFTER DELETE ON COFFEE 
+DECLARE
+v_tot total.tot%type;
+v_avg total.avg%type;
+v_date coffee.cdate%type:=trunc(systimestamp);
+BEGIN
+  select sum(price), avg(price)
+  into v_tot, v_avg
+  from coffee
+  where trunc(cdate)=v_date;
+  update total
+    set tot=v_tot, avg=v_avg, day=v_date
+    where trunc(day)=v_date;
+END;

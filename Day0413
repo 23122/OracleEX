@@ -107,3 +107,12 @@ BEGIN
   end if;
   end if;
 END;
+----날짜표현식----
+select sysdate from dual;
+select systimestamp from dual;
+SELECT TO_CHAR(systimestamp) FROM DUAL;
+SELECT TO_CHAR(systimestamp, 'YYYYMM') FROM DUAL;
+SELECT TO_CHAR(sysdate, 'YYYYMM') FROM DUAL;
+SELECT TO_date('20200202') FROM DUAL;
+SELECT TO_date('202002', 'yyyymm') FROM DUAL;
+SELECT TO_timestamp('202002 02', 'yyyymm hh') FROM DUAL;

@@ -76,3 +76,34 @@ BEGIN
     set tot=v_tot, avg=v_avg, day=v_date
     where trunc(day)=v_date;
 END;
+---insert, delete, update---
+CREATE OR REPLACE TRIGGER TRIG_COFFEE 
+AFTER DELETE OR INSERT OR UPDATE OF PRICE ON COFFEE --FOR EACH ROW 행이여러개일때 한건당 매번 실행
+DECLARE
+v_tot number;
+v_avg number;
+v_count number :=0;
+v_date total.day%type:=trunc(sysdate);
+--:old 참조전의 열의값(insert:null, update:수정전, delete:삭제전)
+--:new 참조전의 열의값(insert:입력date, update:수정할date, delete:null)
+BEGIN
+  select sum(price), avg(price)
+  into v_tot, v_avg
+  from coffee
+  where trunc(cdate)=v_date;
+  select count(day) into v_count
+  from total
+  where trunc(day)=v_date;
+  if deleting or updating then
+    update total
+    set tot=v_tot, avg=v_avg, day=sysdate
+    where trunc(day)=v_date;
+  else if v_count=0 then
+    insert into total
+    VALUES (v_date,v_tot,v_tot);
+  else update total
+    set tot=v_tot, avg=v_avg, day=sysdate
+    where trunc(day)=v_date;
+  end if;
+  end if;
+END;

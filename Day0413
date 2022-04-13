@@ -132,3 +132,94 @@ TO_char(sysdate,'yyyymm'),
     sum(salary*(1+nvl(commission_pct,0)))
     from employees)
 );
+----------ncstest05------------
+select e.department_id,(select sum(s.salary)
+                        from employees s
+                        where s.department_id=e.department_id
+                        group by department_id) salary의합계
+from (select department_id
+      from employees
+      group by department_id) e
+ORDER by department_id;
+
+select e.department_id,d.department_name,(select count(s.department_id)
+                                          from employees s
+                                          where s.department_id=e.department_id
+                                          group by department_id)부서원수
+from (select department_id 
+      from employees
+      group by department_id) e join departments d
+on d.department_id=e.department_id      
+ORDER by department_id;
+
+select department_id, salary
+from employees
+where (department_id,salary) in (select department_id,max(salary)
+                                 from employees                        
+                                 GROUP by department_id)
+order by 1;
+
+select e.department_id,(select avg(s.salary)
+                        from employees s
+                        where s.department_id=e.department_id
+                        group by department_id) 평균급여
+from (select department_id
+      from employees
+      group by department_id) e
+ORDER by department_id;
+select avg(salary)
+from employees
+where department_id=90;
+
+select EMPLOYEE_ID, FIRST_NAME, EMAIL, SALARY
+from EMPLOYEES where DEPARTMENT_ID=100;
+------프로시저----
+create or replace NONEDITIONABLE PROCEDURE PROC_SAL AS
+v_tot list.sal_tot%type;
+v_month list.pay_month%type:=to_char(sysdate,'yyyymm');
+v_count NUMBER :=0;
+BEGIN
+  select sum(salary*(1+nvl(commission_pct,0)))
+  into v_tot
+  from employees;
+  select count(pay_month) into v_count
+  from list
+  where pay_month=v_month;
+  if v_count=0 then
+    insert into list
+    values (v_month,v_tot);
+  else update list
+    set sal_tot=v_tot, pay_month=v_month
+    where pay_month=v_month;
+  end if;
+  commit;
+END PROC_SAL;
+----함수----
+create or replace NONEDITIONABLE FUNCTION FUNC_SAL_TOT RETURN NUMBER AS 
+v_tot list.sal_tot%type;
+BEGIN
+  select sum(salary*(1+nvl(commission_pct,0)))
+  into v_tot
+  from employees;
+  RETURN  v_tot;
+END FUNC_SAL_TOT;
+-----트리거----
+create or replace NONEDITIONABLE TRIGGER TRIG_SAL 
+after insert or UPDATE OF SALARY ON EMPLOYEES 
+DECLARE
+v_tot list.sal_tot%type;
+v_month list.pay_month%type:=to_char(sysdate,'yyyymm');
+v_count number:=0;
+BEGIN
+  v_tot:=FUNC_SAL_TOT;
+  select count(pay_month) into v_count
+  from list
+  where pay_month=v_month;
+  if v_count=0 then
+    insert into list
+    values (v_month,v_tot);
+  else update list
+    set sal_tot=v_tot, pay_month=v_month
+    where pay_month=v_month;
+  end if;
+END;

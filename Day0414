@@ -1,0 +1,4 @@
+CREATE INDEX EMP_PHONENUM_IX ON EMPLOYEES (PHONE_NUMBER);
+
+select * from user_indexes where lower(table_name)='employees';
+select * from user_indexes where table_name = 'EMPLOYEES';

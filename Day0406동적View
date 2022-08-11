@@ -41,8 +41,8 @@ public class BoardConn {
 	public static void main(String[] args) throws SQLException {
 		//DataSource :driverClassName, url, username,password
 		String url="jdbc:oracle:thin:@localhost:1521:xe";
-		String user="nowon";
-		String password="1234";
+		String user="******";
+		String password="******";
 		Connection conn=null;
 		PreparedStatement ptmt=null;
 		try {//DB접속
